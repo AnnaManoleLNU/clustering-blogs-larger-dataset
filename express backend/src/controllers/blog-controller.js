@@ -4,7 +4,7 @@ export class BlogController {
   async getBlogTitles() {
     const blogTitles = [];
 
-    const data = await fs.readFile("./data/blogdata.txt", "utf8");
+    const data = await fs.readFile("./data/articledata.txt", "utf8");
     const lines = data.split("\n");
 
     for (let i = 1; i < lines.length - 1; i++) {
@@ -28,7 +28,7 @@ export class BlogController {
   async getKeywords() {
     const keywords = [];
 
-    const data = await fs.readFile("./data/blogdata.txt", "utf8");
+    const data = await fs.readFile("./data/articledata.txt", "utf8");
     const firstLine = data.split("\n")[0];
 
     const words = firstLine.split("\t");
@@ -41,7 +41,7 @@ export class BlogController {
   }
 
   async getWordCountsForBlog(blog) {
-    const data = await fs.readFile("./data/blogdata.txt", "utf8");
+    const data = await fs.readFile("./data/articledata.txt", "utf8");
     const lines = data.split("\n");
 
     for (const line of lines.slice(1)) {
@@ -59,7 +59,7 @@ export class BlogController {
   // Generate 706 randomly generated counts for each centroid ranging from min to max to that word
   async getKeywordOccurencesRange() {
     // Go through a line and find the minimum number of occurences for a word and return it
-    const data = await fs.readFile("./data/blogdata.txt", "utf8");
+    const data = await fs.readFile("./data/articledata.txt", "utf8");
     const lines = data.split("\n");
 
     const keywordRanges = [];

@@ -10,8 +10,12 @@ import logger from "morgan";
 import helmet from "helmet";
 import { router } from "./routes/router.js";
 import dotenv from "dotenv";
+import { ArticleController } from "./controllers/article-controller.js";
 
 try {
+  const articleController = new ArticleController();
+  articleController.processFiles();
+
   dotenv.config();
 
   const app = express();
