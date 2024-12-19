@@ -1,4 +1,4 @@
-Article language programming computer software hardware data player online system development machine console developer design history technology standard information article example
+Article	language	programming	computer	software	hardware	data	player	online	system	development	machine	console	developer	design	history	technology	standard	information	article	example
 Action-adventure_game	0	1	0	0	0	0	8	4	1	0	0	0	1	1	1	0	0	0	0	0
 Action_game	0	1	0	0	0	0	30	5	1	0	0	0	0	1	1	0	0	1	0	1
 Action_role-playing_game	0	1	3	0	0	0	7	6	4	0	0	0	0	0	4	0	1	0	1	1

@@ -1,7 +1,7 @@
 import { BlogController } from "./blog-controller.js";
 
 export class TreeClusterController {
-  #numberOfWords = 706;
+  #numberOfWords = 20;
 
   constructor() {
     this.clusters = [];

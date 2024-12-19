@@ -12,7 +12,8 @@ export class BlogController {
       blogTitles.push(name);
     }
 
-    return blogTitles; // 99
+    console.log(blogTitles.length);
+    return blogTitles; // 180
   }
 
   // Arrow function to bind this to the class instance
@@ -37,7 +38,7 @@ export class BlogController {
     }
 
     console.log(keywords.length);
-    return keywords; // 706
+    return keywords; // 19
   }
 
   async getWordCountsForBlog(blog) {
@@ -56,7 +57,7 @@ export class BlogController {
     return blog; // If it's not found in the file, return the input (centroid case)
   }
 
-  // Generate 706 randomly generated counts for each centroid ranging from min to max to that word
+  // Randomly generated counts for each centroid ranging from min to max to that word
   async getKeywordOccurencesRange() {
     // Go through a line and find the minimum number of occurences for a word and return it
     const data = await fs.readFile("./data/articledata.txt", "utf8");

@@ -5,9 +5,13 @@ export class ArticleController {
     this.words = ["language", "programming", "computer", "software", "hardware", "data", "player", "online", "system", "development", "machine", "console", "developer", "design", "history", "technology", "standard", "information", "article", "example"];
   }
 
+  getNumberOfWords() {
+    return this.words.length;
+  }
+
   generateHeader() {
     // The header should contain the word "Article" and all the words from the array
-    return "Article " + this.words.join(" ");
+    return "Article\t" + this.words.join("\t");
   }
 
   async getWordOccurences(folder, file) {

@@ -15,6 +15,7 @@ import { ArticleController } from "./controllers/article-controller.js";
 try {
   const articleController = new ArticleController();
   articleController.processFiles();
+  console.log("Articles processed successfully");
 
   dotenv.config();
 

@@ -3,6 +3,7 @@ import { BlogController } from "./blog-controller.js";
 export class ClusterController {
   constructor() {
     this.blogController = new BlogController();
+    this.numberOfWords = 20;
   }
 
   async pearsons(wordCountsA, wordCountsB) {
@@ -12,8 +13,7 @@ export class ClusterController {
       sumBsq = 0,
       pSum = 0;
 
-    const numberOfWords = 706;
-    for (let i = 0; i < numberOfWords; i++) {
+    for (let i = 0; i < this.numberOfWords; i++) {
       const wordCountA = wordCountsA[i];
       const wordCountB = wordCountsB[i];
       sumA += wordCountA;
@@ -23,12 +23,13 @@ export class ClusterController {
       pSum += wordCountA * wordCountB;
     }
 
-    const numerator = pSum - (sumA * sumB) / numberOfWords;
+    const numerator = pSum - (sumA * sumB) / this.numberOfWords;
     const denominator = Math.sqrt(
-      (sumAsq - sumA ** 2 / numberOfWords) *
-        (sumBsq - sumB ** 2 / numberOfWords)
+      (sumAsq - sumA ** 2 / this.numberOfWords) *
+        (sumBsq - sumB ** 2 / this.numberOfWords)
     );
 
+    if (denominator === 0) return 1; // Maximum distance if denominator is zero
     return 1 - numerator / denominator;
   }
 
@@ -51,7 +52,7 @@ export class ClusterController {
 
   generateCentroid(keywordRanges) {
     const centroid = [];
-    for (let i = 0; i < 706; i++) {
+    for (let i = 0; i < this.numberOfWords; i++) {
       const min = keywordRanges[i].min;
       const max = keywordRanges[i].max;
       centroid.push(Math.floor(Math.random() * (max - min) + min));
@@ -77,18 +78,24 @@ export class ClusterController {
   async assignBlogToCentroid(blogWordCounts, centroids) {
     let bestCentroid = null;
     let minDistance = Infinity;
-
+  
     for (let i = 0; i < centroids.length; i++) {
-      const distance = await this.pearsons(
-        blogWordCounts,
-        centroids[i].wordCounts
-      );
+      if (!centroids[i].wordCounts) {
+        console.warn(`Centroid ${centroids[i].id} has no wordCounts`);
+        continue;
+      }
+      
+      const distance = await this.pearsons(blogWordCounts, centroids[i].wordCounts);
       if (distance < minDistance) {
         minDistance = distance;
         bestCentroid = centroids[i];
       }
     }
-
+  
+    if (!bestCentroid) {
+      throw new Error('No suitable centroid found for blog');
+    }
+  
     return bestCentroid;
   }
 
@@ -119,7 +126,7 @@ export class ClusterController {
       // Recalculate centroids
       for (let i = 0; i < centroids.length; i++) {
         const centroid = centroids[i];
-        for (let j = 0; j < 706; j++) {
+        for (let j = 0; j < this.numberOfWords; j++) {
           let sum = 0;
           for (let k = 0; k < centroid.assignments.length; k++) {
             const blog = centroid.assignments[k];
@@ -213,7 +220,7 @@ export class ClusterController {
 
   getClustersFixedIterations = async (req, res, next) => {
     try {
-      const clusters = await this.kMeansClusteringFixedIterations(5);
+      const clusters = await this.kMeansClusteringFixedIterations(2);
       res.status(200).json(clusters);
     } catch (error) {
       console.log(error);
@@ -223,7 +230,7 @@ export class ClusterController {
 
   getClustersFlexibleIterations = async(req, res, next) => {
     try {
-      const clusters = await this.kMeansClusteringFlexibleIterations(5);
+      const clusters = await this.kMeansClusteringFlexibleIterations(2);
       res.status(200).json(clusters);
     } catch (error) {
       console.log(error)
