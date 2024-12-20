@@ -17,6 +17,8 @@ try {
   const adf = new ArticleDataFormatter();
   adf.processFiles();
   console.log("Articles processed successfully");
+  const results = await adf.getTopWords();
+  console.log(results);
   // ---------------------------- //
 
   dotenv.config();
