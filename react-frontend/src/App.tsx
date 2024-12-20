@@ -23,7 +23,7 @@ function App() {
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
 
   const fetchBlogTitles = async () => {
-    const response = await fetch("http://localhost:3000/blogs");
+    const response = await fetch("http://localhost:3000/articles");
     const data = await response.json();
     setBlogs(data);
   };

@@ -1,25 +1,25 @@
-import { BlogController } from "./blog-controller.js";
+import { ArticleController } from "./article-controller.js";
 
 export class TreeClusterController {
   #numberOfWords = 20;
 
   constructor() {
     this.clusters = [];
-    this.blogController = new BlogController();
+    this.articleController = new ArticleController();
   }
 
-  // Generate initial clusters from blog titles
+  // Generate initial clusters from article titles
   async generateClusters() {
-    const blogTitles = await this.blogController.getBlogTitles();
+    const articleTitles = await this.articleController.getArticleTitles();
 
-    for (const blogTitle of blogTitles) {
-      const wordCounts = await this.blogController.getWordCountsForBlog(
-        blogTitle
+    for (const articleTitle of articleTitles) {
+      const wordCounts = await this.articleController.getWordCountsForArticle(
+        articleTitle
       );
 
-      // Create a cluster for each blog
+      // Create a cluster for each article
       const cluster = {
-        blog: { blogTitle: blogTitle, wordCount: wordCounts },
+        article: { articleTitle: articleTitle, wordCount: wordCounts },
         left: null,
         right: null,
         parent: null,
@@ -66,19 +66,19 @@ export class TreeClusterController {
     clusterA.parent = newCluster;
     clusterB.parent = newCluster;
 
-    const newBlog = {
+    const newarticle = {
       wordCount: [],
     };
 
-    // Calculate the average word count for the new merged blog
+    // Calculate the average word count for the new merged article
     for (let i = 0; i < this.#numberOfWords; i++) {
-      const countA = clusterA.blog ? clusterA.blog.wordCount[i] : 0;
-      const countB = clusterB.blog ? clusterB.blog.wordCount[i] : 0;
+      const countA = clusterA.article ? clusterA.article.wordCount[i] : 0;
+      const countB = clusterB.article ? clusterB.article.wordCount[i] : 0;
 
-      newBlog.wordCount[i] = (countA + countB) / 2;
+      newarticle.wordCount[i] = (countA + countB) / 2;
     }
 
-    newCluster.blog = newBlog;
+    newCluster.article = newarticle;
 
     return newCluster;
   }
@@ -97,8 +97,8 @@ export class TreeClusterController {
       for (let i = 0; i < this.clusters.length; i++) {
         for (let j = i + 1; j < this.clusters.length; j++) {
           const distance = await this.pearsons(
-            this.clusters[i].blog.wordCount,
-            this.clusters[j].blog.wordCount
+            this.clusters[i].article.wordCount,
+            this.clusters[j].article.wordCount
           );
           if (distance < closest) {
             closest = distance;
@@ -123,7 +123,7 @@ export class TreeClusterController {
   serializeTree(cluster) {
     if (!cluster) return null;
 
-    const title = cluster.blog.blogTitle || null;
+    const title = cluster.article.articleTitle || null;
 
     return {
       title: title,

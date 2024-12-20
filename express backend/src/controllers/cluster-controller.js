@@ -1,8 +1,8 @@
-import { BlogController } from "./blog-controller.js";
+import { ArticleController } from "./article-controller.js";
 
 export class ClusterController {
   constructor() {
-    this.blogController = new BlogController();
+    this.articleController = new ArticleController();
     this.numberOfWords = 20;
   }
 
@@ -33,18 +33,18 @@ export class ClusterController {
     return 1 - numerator / denominator;
   }
 
-  async fetchAllWordCounts(blogs) {
+  async fetchAllWordCounts(articles) {
     const wordCountsPromises = [];
-    for (let i = 0; i < blogs.length; i++) {
+    for (let i = 0; i < articles.length; i++) {
       wordCountsPromises.push(
-        this.blogController.getWordCountsForBlog(blogs[i])
+        this.articleController.getWordCountsForArticle(articles[i])
       );
     }
     const wordCountsArray = await Promise.all(wordCountsPromises);
 
     const wordCountsCache = {};
-    for (let i = 0; i < blogs.length; i++) {
-      wordCountsCache[blogs[i]] = wordCountsArray[i];
+    for (let i = 0; i < articles.length; i++) {
+      wordCountsCache[articles[i]] = wordCountsArray[i];
     }
 
     return wordCountsCache;
@@ -75,7 +75,7 @@ export class ClusterController {
     return centroids;
   }
 
-  async assignBlogToCentroid(blogWordCounts, centroids) {
+  async assignArticleToCentroid(articleWordCounts, centroids) {
     let bestCentroid = null;
     let minDistance = Infinity;
   
@@ -85,24 +85,20 @@ export class ClusterController {
         continue;
       }
       
-      const distance = await this.pearsons(blogWordCounts, centroids[i].wordCounts);
+      const distance = await this.pearsons(articleWordCounts, centroids[i].wordCounts);
       if (distance < minDistance) {
         minDistance = distance;
         bestCentroid = centroids[i];
       }
     }
   
-    if (!bestCentroid) {
-      throw new Error('No suitable centroid found for blog');
-    }
-  
     return bestCentroid;
   }
 
   async kMeansClusteringFixedIterations(k) {
-    const blogs = await this.blogController.getBlogTitles();
-    const keywordRanges = await this.blogController.getKeywordOccurencesRange();
-    const allWordCounts = await this.fetchAllWordCounts(blogs);
+    const articles = await this.articleController.getArticleTitles();
+    const keywordRanges = await this.articleController.getKeywordOccurencesRange();
+    const allWordCounts = await this.fetchAllWordCounts(articles);
 
     let centroids = this.generateCentroids(keywordRanges, k);
     const maxIterations = 10;
@@ -112,15 +108,15 @@ export class ClusterController {
         centroids[i].assignments = [];
       }
 
-      // Assign to blog
-      for (let i = 0; i < blogs.length; i++) {
-        const blog = blogs[i];
-        const blogWordCounts = allWordCounts[blog];
-        const bestCentroid = await this.assignBlogToCentroid(
-          blogWordCounts,
+      // Assign to article
+      for (let i = 0; i < articles.length; i++) {
+        const article = articles[i];
+        const articleWordCounts = allWordCounts[article];
+        const bestCentroid = await this.assignArticleToCentroid(
+          articleWordCounts,
           centroids
         );
-        bestCentroid.assignments.push(blog);
+        bestCentroid.assignments.push(article);
       }
 
       // Recalculate centroids
@@ -129,8 +125,8 @@ export class ClusterController {
         for (let j = 0; j < this.numberOfWords; j++) {
           let sum = 0;
           for (let k = 0; k < centroid.assignments.length; k++) {
-            const blog = centroid.assignments[k];
-            sum += allWordCounts[blog][j];
+            const article = centroid.assignments[k];
+            sum += allWordCounts[article][j];
           }
           centroid.wordCounts[j] = Math.floor(
             sum / centroid.assignments.length
@@ -149,9 +145,9 @@ export class ClusterController {
   }
 
   async kMeansClusteringFlexibleIterations(k) {
-    const blogs = await this.blogController.getBlogTitles();
-    const keywordRanges = await this.blogController.getKeywordOccurencesRange();
-    const allWordCounts = await this.fetchAllWordCounts(blogs);
+    const articles = await this.articleController.getArticleTitles();
+    const keywordRanges = await this.articleController.getKeywordOccurencesRange();
+    const allWordCounts = await this.fetchAllWordCounts(articles);
 
     let centroids = this.generateCentroids(keywordRanges, k);
     let hasAssignmentChanged = true;
@@ -166,15 +162,15 @@ export class ClusterController {
         centroids[i].assignments = [];
       }
 
-      // Assign blog to centroids
-      for (let i = 0; i < blogs.length; i++) {
-        const blog = blogs[i];
-        const blogWordCounts = allWordCounts[blog];
-        const bestCentroid = await this.assignBlogToCentroid(
-          blogWordCounts,
+      // Assign article to centroids
+      for (let i = 0; i < articles.length; i++) {
+        const article = articles[i];
+        const articleWordCounts = allWordCounts[article];
+        const bestCentroid = await this.assignArticleToCentroid(
+          articleWordCounts,
           centroids
         );
-        bestCentroid.assignments.push(blog);
+        bestCentroid.assignments.push(article);
       }
 
       // Check if assignments changed
@@ -199,8 +195,8 @@ export class ClusterController {
         for (let j = 0; j < 760; j++) {
           let sum = 0;
           for (let k = 0; k < centroid.assignments.length; k++) {
-            const blog = centroid.assignments[k];
-            sum += allWordCounts[blog][j]; // sum of all word counts for a keyword
+            const article = centroid.assignments[k];
+            sum += allWordCounts[article][j]; // sum of all word counts for a keyword
           }
           centroid.wordCounts[j] = Math.floor(sum / centroid.assignments.length)
         }

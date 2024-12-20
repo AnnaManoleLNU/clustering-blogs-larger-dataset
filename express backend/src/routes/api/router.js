@@ -5,6 +5,6 @@ import { clusterRouter } from "./cluster-router.js";
 export const routerAPI = express.Router();
 
 // Mount the routers.
-routerAPI.use("/blogs", blogRouter);
+routerAPI.use("/articles", blogRouter);
 
 routerAPI.use("/clusters", clusterRouter);

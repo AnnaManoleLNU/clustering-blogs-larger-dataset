@@ -10,12 +10,14 @@ import logger from "morgan";
 import helmet from "helmet";
 import { router } from "./routes/router.js";
 import dotenv from "dotenv";
-import { ArticleController } from "./controllers/article-controller.js";
+import { ArticleDataFormatter } from "./controllers/articledata-formatter.js";
 
 try {
-  const articleController = new ArticleController();
-  articleController.processFiles();
+  // Process the articles and generate the articledata.txt file.
+  const adf = new ArticleDataFormatter();
+  adf.processFiles();
   console.log("Articles processed successfully");
+  // ---------------------------- //
 
   dotenv.config();
 

@@ -1,8 +1,8 @@
 import express from "express";
-import { BlogController } from "../../controllers/blog-controller.js";
+import { ArticleController } from "../../controllers/article-controller.js";
 
 export const blogRouter = express.Router();
 
-const controller = new BlogController();
+const controller = new ArticleController();
 
-blogRouter.get("/", controller.getBlogTitlesJson)
+blogRouter.get("/", controller.getArticleTitlesJson);
