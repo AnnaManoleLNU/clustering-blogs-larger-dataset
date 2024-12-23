@@ -28,6 +28,7 @@ function App() {
   const [isLoadingFixed, setIsLoadingFixed] = useState<boolean>(false);
   const [isLoadingFlexible, setIsLoadingFlexible] = useState<boolean>(false);
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
+  const [treeMetrics, setTreeMetrics] = useState<{ depth: number; totalNodes: number }>({ depth: 0, totalNodes: 0 });
   const [wordSelection, setWordSelection] = useState<string>("words"); // Dropdown state
 
   const fetchArticleTitles = async () => {
@@ -79,6 +80,10 @@ function App() {
     const data = await response.json();
     const transformedData = transformData(data);
     setTreeData(transformedData);
+
+    // Calculate metrics for the tree
+    const metrics = calculateTreeMetrics(transformedData);
+    setTreeMetrics(metrics);
   };
 
   const transformData = (
@@ -96,11 +101,29 @@ function App() {
     return [
       {
         id: nodeId,
-        title: data.title || "Cluster",
+        title: data.title,
         depth,
         children: transformedChildren,
       },
     ];
+  };
+
+  const calculateTreeMetrics = (tree: TreeNode[]): { depth: number; totalNodes: number } => {
+    const getDepth = (node: TreeNode): number => {
+      if (!node.children || node.children.length === 0) return 1;
+      return 1 + Math.max(...node.children.map(getDepth));
+    };
+
+    const getTotalNodes = (node: TreeNode): number => {
+      if (!node.children || node.children.length === 0) return 1;
+      return (
+        1 + node.children.reduce((sum, child) => sum + getTotalNodes(child), 0)
+      );
+    };
+
+    if (tree.length === 0) return { depth: 0, totalNodes: 0 };
+    const root = tree[0];
+    return { depth: getDepth(root), totalNodes: getTotalNodes(root) };
   };
 
   return (
@@ -159,6 +182,13 @@ function App() {
           </div>
         </div>
       ))}
+
+      <div className="mt-2 inline-flex gap-2 text-primary bg-accent-foreground p-2 rounded-lg">
+      
+        <Small text={`Tree Depth: ${treeMetrics.depth} `} />
+        <Small text={`Total Nodes: ${treeMetrics.totalNodes}`} />
+
+      </div>
 
       <TreeView data={treeData} />
     </>
