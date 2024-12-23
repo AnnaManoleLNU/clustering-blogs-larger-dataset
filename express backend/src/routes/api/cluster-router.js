@@ -21,10 +21,10 @@ const adf = new ArticleDataFormatter();
   }
 })();
 
-// Middleware to dynamically select file and initialize `ClusterController`
-const setFileMiddleware = (useSelectedWords) => async (req, res, next) => {
+// Middleware to dynamically select file and initialize controller
+const setFileMiddleware = (controller, useSelectedWords) => async (req, res, next) => {
   try {
-    await kController.setFileAndInitialize(useSelectedWords);
+    await controller.setFileAndInitialize(useSelectedWords);
     next();
   } catch (error) {
     console.error("Error during file initialization:", error);
@@ -35,29 +35,36 @@ const setFileMiddleware = (useSelectedWords) => async (req, res, next) => {
 // Routes
 clusterRouter.get(
   "/kfixed",
-  setFileMiddleware(false), // Use words_data.txt
+  setFileMiddleware(kController, false), // Use words_data.txt
   kController.getClustersFixedIterations
 );
 
 clusterRouter.get(
   "/kflexible",
-  setFileMiddleware(false), // Use words_data.txt
-  kController.getClustersFlexibleIterations
-);
-
-clusterRouter.get(
-  "/kfixed-selected",
-  setFileMiddleware(true), // Use selectedWords_data.txt
-  kController.getClustersFixedIterations
-);
-
-clusterRouter.get(
-  "/kflexible-selected",
-  setFileMiddleware(true), // Use selectedWords_data.txt
+  setFileMiddleware(kController, false), // Use words_data.txt
   kController.getClustersFlexibleIterations
 );
 
 clusterRouter.get(
   "/hierarchical",
+  setFileMiddleware(treeClusterController, false), // Use words_data.txt
+  treeClusterController.getHierarchicalClustering
+);
+
+clusterRouter.get(
+  "/kfixed-selected",
+  setFileMiddleware(kController, true), // Use selectedWords_data.txt
+  kController.getClustersFixedIterations
+);
+
+clusterRouter.get(
+  "/kflexible-selected",
+  setFileMiddleware(kController, true), // Use selectedWords_data.txt
+  kController.getClustersFlexibleIterations
+);
+
+clusterRouter.get(
+  "/hierarchical-selected",
+  setFileMiddleware(treeClusterController, true), // Use selectedWords_data.txt
   treeClusterController.getHierarchicalClustering
 );

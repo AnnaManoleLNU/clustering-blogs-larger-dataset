@@ -9,7 +9,7 @@ import { Small } from "./components/typography/small";
 interface Cluster {
   [key: string]: {
     assignments: string[];
-    accuracy: number; 
+    accuracy: number;
     gameCount: number;
     programmingCount: number;
   };
@@ -27,6 +27,7 @@ function App() {
   const [isLoadingFixed, setIsLoadingFixed] = useState<boolean>(false);
   const [isLoadingFlexible, setIsLoadingFlexible] = useState<boolean>(false);
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
+  const [wordSelection, setWordSelection] = useState<string>("words"); // Dropdown state
 
   const fetchArticleTitles = async () => {
     const response = await fetch("http://localhost:3000/articles");
@@ -42,7 +43,11 @@ function App() {
     if (isLoadingFixed) return;
     setIsLoadingFixed(true);
     setTreeData([]);
-    const response = await fetch("http://localhost:3000/clusters/kfixed-selected");
+    const route =
+      wordSelection === "words"
+        ? "http://localhost:3000/clusters/kfixed"
+        : "http://localhost:3000/clusters/kfixed-selected";
+    const response = await fetch(route);
     const data = await response.json();
     setIsLoadingFixed(false);
     setClusters(data);
@@ -52,10 +57,26 @@ function App() {
     if (isLoadingFlexible) return;
     setIsLoadingFlexible(true);
     setTreeData([]);
-    const response = await fetch("http://localhost:3000/clusters/kflexible");
+    const route =
+      wordSelection === "words"
+        ? "http://localhost:3000/clusters/kflexible"
+        : "http://localhost:3000/clusters/kflexible-selected";
+    const response = await fetch(route);
     const data = await response.json();
     setIsLoadingFlexible(false);
     setClusters(data);
+  };
+
+  const clusterArticlesHierarchical = async () => {
+    setClusters({});
+    const route =
+      wordSelection === "words"
+        ? "http://localhost:3000/clusters/hierarchical"
+        : "http://localhost:3000/clusters/hierarchical-selected";
+    const response = await fetch(route);
+    const data = await response.json();
+    const transformedData = transformData(data);
+    setTreeData(transformedData);
   };
 
   const transformData = (
@@ -81,14 +102,6 @@ function App() {
     ];
   };
 
-  const clusterarticlesHierarchical = async () => {
-    setClusters({});
-    const response = await fetch("http://localhost:3000/clusters/hierarchical");
-    const data = await response.json();
-    const transformedData = transformData(data);
-    setTreeData(transformedData);
-  };
-
   return (
     <>
       <H1 text="Articles available" />
@@ -104,6 +117,16 @@ function App() {
       />
 
       <div className="flex gap-2 mt-4 mb-4">
+        {/* Dropdown for Word Selection */}
+        <select
+          value={wordSelection}
+          onChange={(e) => setWordSelection(e.target.value)}
+          className="p-2 border rounded"
+        >
+          <option value="words">Default Words</option>
+          <option value="selectedWords">Selected Words</option>
+        </select>
+
         <Button
           onClick={clusterArticlesFixedIterations}
           disabled={isLoadingFixed}
@@ -116,7 +139,7 @@ function App() {
         >
           Cluster articles flexible iterations
         </Button>
-        <Button onClick={clusterarticlesHierarchical}>
+        <Button onClick={clusterArticlesHierarchical}>
           Cluster articles hierarchically
         </Button>
       </div>
@@ -125,13 +148,12 @@ function App() {
         <div key={clusterName}>
           <H2 text={clusterName} className="-mb-2 !mt-2 border-b-0" />
           <Small text={articles.assignments.join(" ♦ ")} />
-          
+
           <div className="flex gap-2 mt-2 bg-primary p-2 rounded-lg">
             <Small text={`Accuracy: ${articles.accuracy.toFixed(2)}%`} />
             <Small text={`Game count: ${articles.gameCount}`} />
             <Small text={`Programming count: ${articles.programmingCount}`} />
           </div>
-
         </div>
       ))}
 

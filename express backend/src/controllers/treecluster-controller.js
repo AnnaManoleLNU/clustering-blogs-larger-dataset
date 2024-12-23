@@ -1,11 +1,23 @@
 import { ArticleController } from "./article-controller.js";
 
 export class TreeClusterController {
-  #numberOfWords = 20;
+  #numberOfWords = 0; // Initialize dynamically
 
   constructor() {
     this.clusters = [];
     this.articleController = new ArticleController();
+  }
+
+  // Dynamically set the file path and initialize number of words
+  async setFileAndInitialize(useSelectedWords = false) {
+    this.articleController.setFilePath(useSelectedWords);
+    const keywords = await this.articleController.getKeywords();
+    this.#numberOfWords = keywords.length;
+    console.log(
+      `File set to: ${
+        useSelectedWords ? "selectedWords_data.txt" : "words_data.txt"
+      }, Number of words: ${this.#numberOfWords}`
+    );
   }
 
   // Generate initial clusters from article titles
