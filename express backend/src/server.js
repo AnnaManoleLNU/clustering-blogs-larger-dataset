@@ -15,10 +15,11 @@ import { ArticleDataFormatter } from "./controllers/articledata-formatter.js";
 try {
   // Process the articles and generate the articledata.txt file.
   const adf = new ArticleDataFormatter();
-  adf.processFiles();
+  const chosenWords = adf.words;
+  await adf.processFiles(chosenWords);
   console.log("Articles processed successfully");
   const results = await adf.getTopWords();
-  console.log(results);
+  console.log("results", results);
   // ---------------------------- //
 
   dotenv.config();

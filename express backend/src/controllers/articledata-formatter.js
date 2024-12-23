@@ -12,42 +12,42 @@ export class ArticleDataFormatter {
     this.selectedWords = [];
   }
 
-  getNumberOfWords() {
-    return this.words.length;
+  getNumberOfWords(chosenWords) {
+    return chosenWords.length;
   }
 
-  generateHeader() {
-    return "Article\t" + this.words.join("\t");
+  generateHeader(chosenWords) {
+    return "Article\t" + chosenWords.join("\t");
   }
 
-  async getWordOccurences(folder, file) {
+  async getWordOccurences(folder, file, chosenWords) {
     const data = await fs.readFile(`${folder}/${file}`, "utf8");
     const words = data.split(" ");
-    return this.words.map(word => words.filter(w => w === word).length);
+    return chosenWords.map(word => words.filter(w => w === word).length);
   }
 
-  async processFiles() {
-    const header = this.generateHeader();
+  async processFiles(chosenWords) {
+    const header = this.generateHeader(chosenWords); 
     await fs.writeFile("./data/articledata.txt", header + "\n");
-    
+
     const gamesFolder = "./data/Wikipedia_clustering/Games";
     for (const file of await fs.readdir(gamesFolder)) {
-      const row = []
-      row.push(file);
-      const occurences = await this.getWordOccurences(gamesFolder, file);
-      row.push(...occurences);
-      await fs.appendFile("./data/articledata.txt", row.join("\t") + "\n");
+        const row = [];
+        row.push(file);
+        const occurrences = await this.getWordOccurences(gamesFolder, file, chosenWords);
+        row.push(...occurrences);
+        await fs.appendFile("./data/articledata.txt", row.join("\t") + "\n");
     }
-    
+
     const programmingFolder = "./data/Wikipedia_clustering/Programming";
     for (const file of await fs.readdir(programmingFolder)) {
-      const row = []
-      row.push(file);
-      const occurences = await this.getWordOccurences(programmingFolder, file);
-      row.push(...occurences);
-      await fs.appendFile("./data/articledata.txt", row.join("\t") + "\n");
+        const row = [];
+        row.push(file);
+        const occurrences = await this.getWordOccurences(programmingFolder, file, chosenWords);
+        row.push(...occurrences);
+        await fs.appendFile("./data/articledata.txt", row.join("\t") + "\n");
     }
-  }
+}
 
   // Returns top 10 words from a given file in a folder.
   async getTopWordsFromFile(folder, file) {
@@ -109,8 +109,8 @@ export class ArticleDataFormatter {
   }
 
   // Filter filler words such as "the", "and", "of", etc.
-  gamesTopWords = gamesTopWords.filter(word => !this.fillerWords.has(word.word));
-  programmingTopWords = programmingTopWords.filter(word => !this.fillerWords.has(word.word));
+  gamesTopWords = gamesTopWords.filter(word => !this.fillerWords.includes(word.word));
+  programmingTopWords = programmingTopWords.filter(word => !this.fillerWords.includes(word.word));
 
   // Sort the top words by count in descending order
   gamesTopWords.sort((a, b) => b.count - a.count);
@@ -121,8 +121,7 @@ export class ArticleDataFormatter {
   programmingTopWords = programmingTopWords.slice(0, 50);
 
   this.selectedWords = gamesTopWords.concat(programmingTopWords).map(word => word.word);
-  //  log the words and their counts
-  // console.log(gamesTopWords);
-  // console.log(programmingTopWords);
+  console.log("Selected words gathered successfully");
+  return this.selectedWords;
   }
 }
