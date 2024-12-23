@@ -10,18 +10,8 @@ import logger from "morgan";
 import helmet from "helmet";
 import { router } from "./routes/router.js";
 import dotenv from "dotenv";
-import { ArticleDataFormatter } from "./controllers/articledata-formatter.js";
 
 try {
-  // Process the articles and generate the articledata.txt file.
-  const adf = new ArticleDataFormatter();
-  const chosenWords = adf.words;
-  await adf.processFiles(chosenWords);
-  console.log("Articles processed successfully");
-  // const results = await adf.getTopWords();
-  // console.log("results", results);
-  // ---------------------------- //
-
   dotenv.config();
 
   const app = express();

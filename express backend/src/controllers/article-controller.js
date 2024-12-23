@@ -1,10 +1,22 @@
 import fs from "fs-extra";
 
 export class ArticleController {
+  constructor() {
+    // Default file path (can be switched dynamically)
+    this.defaultFilePath = "./data/words_data.txt";
+  }
+
+  // Set the file path based on word set
+  setFilePath(useSelectedWords = false) {
+    this.defaultFilePath = useSelectedWords
+      ? "./data/selectedWords_data.txt"
+      : "./data/words_data.txt";
+  }
+
   async getArticleTitles() {
     const articleTitles = [];
 
-    const data = await fs.readFile("./data/articledata.txt", "utf8");
+    const data = await fs.readFile(this.defaultFilePath, "utf8");
     const lines = data.split("\n");
 
     for (let i = 1; i < lines.length - 1; i++) {
@@ -13,7 +25,7 @@ export class ArticleController {
     }
 
     console.log(articleTitles.length);
-    return articleTitles; // 180
+    return articleTitles;
   }
 
   // Arrow function to bind this to the class instance
@@ -24,12 +36,12 @@ export class ArticleController {
     } catch (error) {
       next(error);
     }
-  };  
+  };
 
   async getKeywords() {
     const keywords = [];
 
-    const data = await fs.readFile("./data/articledata.txt", "utf8");
+    const data = await fs.readFile(this.defaultFilePath, "utf8");
     const firstLine = data.split("\n")[0];
 
     const words = firstLine.split("\t");
@@ -38,11 +50,11 @@ export class ArticleController {
     }
 
     console.log(keywords.length);
-    return keywords; // 19
+    return keywords;
   }
 
   async getWordCountsForArticle(article) {
-    const data = await fs.readFile("./data/articledata.txt", "utf8");
+    const data = await fs.readFile(this.defaultFilePath, "utf8");
     const lines = data.split("\n");
 
     for (const line of lines.slice(1)) {
@@ -59,12 +71,12 @@ export class ArticleController {
 
   // Randomly generated counts for each centroid ranging from min to max to that word
   async getKeywordOccurencesRange() {
-    // Go through a line and find the minimum number of occurences for a word and return it
-    const data = await fs.readFile("./data/articledata.txt", "utf8");
+    const data = await fs.readFile(this.defaultFilePath, "utf8");
     const lines = data.split("\n");
 
     const keywordRanges = [];
-    const numberOfKeywords = 20;
+    const numberOfKeywords = lines[0].split("\t").length - 1; // Adjust based on header
+
     for (let i = 0; i < numberOfKeywords; i++) {
       keywordRanges.push({ min: Infinity, max: -Infinity });
     }

@@ -12,10 +12,6 @@ export class ArticleDataFormatter {
     this.selectedWords = [];
   }
 
-  getNumberOfWords(chosenWords) {
-    return chosenWords.length;
-  }
-
   generateHeader(chosenWords) {
     return "Article\t" + chosenWords.join("\t");
   }
@@ -26,31 +22,37 @@ export class ArticleDataFormatter {
     return chosenWords.map(word => words.filter(w => w === word).length);
   }
 
-  async processFiles(chosenWords) {
-    const header = this.generateHeader(chosenWords); 
-    await fs.writeFile("./data/articledata.txt", header + "\n");
-
+  async processFiles(chosenWords, useSelectedWords = false) {
+    // Determine output file name based on word set
+    const outputFilePath = useSelectedWords
+      ? "./data/selectedWords_data.txt"
+      : "./data/words_data.txt";
+  
+    // Initialize the file with a header
+    const header = this.generateHeader(chosenWords);
+    await fs.writeFile(outputFilePath, header + "\n");
+  
     const gamesFolder = "./data/Wikipedia_clustering/Games";
-    for (const file of await fs.readdir(gamesFolder)) {
-        const row = [];
-        row.push(file);
-        const occurrences = await this.getWordOccurences(gamesFolder, file, chosenWords);
-        row.push(...occurrences);
-        await fs.appendFile("./data/articledata.txt", row.join("\t") + "\n");
-    }
-
     const programmingFolder = "./data/Wikipedia_clustering/Programming";
-    for (const file of await fs.readdir(programmingFolder)) {
-        const row = [];
-        row.push(file);
-        const occurrences = await this.getWordOccurences(programmingFolder, file, chosenWords);
-        row.push(...occurrences);
-        await fs.appendFile("./data/articledata.txt", row.join("\t") + "\n");
+  
+    const folders = [gamesFolder, programmingFolder];
+  
+    for (const folder of folders) {
+      for (const file of await fs.readdir(folder)) {
+        // Get word occurrences for the current file
+        const occurrences = await this.getWordOccurences(folder, file, chosenWords);
+  
+        const row = [file, ...occurrences];
+
+        await fs.appendFile(outputFilePath, row.join("\t") + "\n");
+      }
     }
-}
+  
+    console.log(`Processing completed. Output written to: ${outputFilePath}`);
+  }
 
   // Returns top 10 words from a given file in a folder.
-  async getTopWordsFromFile(folder, file) {
+  async #getTopWordsFromFile(folder, file) {
     const data = await fs.readFile(`${folder}/${file}`, "utf8");
     const words = data.split(" ");
 
@@ -72,8 +74,7 @@ export class ArticleDataFormatter {
     return sortedWords;
   }
 
-  // Returns the top 100 words from the Games and Programming folders combined, without duplicates or filler words.
-  async getTopWords() {
+  async generateSelectedWords() {
     const gamesFolder = "./data/Wikipedia_clustering/Games";
     const programmingFolder = "./data/Wikipedia_clustering/Programming";
 
@@ -85,7 +86,7 @@ export class ArticleDataFormatter {
   const programmingWordsSet = new Set();
 
   for (const file of await fs.readdir(gamesFolder)) {
-    const topWords = await this.getTopWordsFromFile(gamesFolder, file);
+    const topWords = await this.#getTopWordsFromFile(gamesFolder, file);
 
     // Add top words to gamesTopWords only if they are not duplicates
     for (const [word, count] of topWords) {
@@ -97,7 +98,7 @@ export class ArticleDataFormatter {
   }
 
   for (const file of await fs.readdir(programmingFolder)) {
-    const topWords = await this.getTopWordsFromFile(programmingFolder, file);
+    const topWords = await this.#getTopWordsFromFile(programmingFolder, file);
 
     // Add top words to programmingTopWords only if they are not duplicates
     for (const [word, count] of topWords) {

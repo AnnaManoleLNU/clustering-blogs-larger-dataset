@@ -42,7 +42,7 @@ function App() {
     if (isLoadingFixed) return;
     setIsLoadingFixed(true);
     setTreeData([]);
-    const response = await fetch("http://localhost:3000/clusters/kfixed");
+    const response = await fetch("http://localhost:3000/clusters/kfixed-selected");
     const data = await response.json();
     setIsLoadingFixed(false);
     setClusters(data);
@@ -94,10 +94,12 @@ function App() {
       <H1 text="Articles available" />
 
       <ArticleCategoryTitles
+        title="Gaming articles"
         articleTitles={articles.slice(0, 90).join(" ♦ ")}
       />
 
       <ArticleCategoryTitles
+        title="Programming articles"
         articleTitles={articles.slice(90, 180).join(" ♦ ")}
       />
 
