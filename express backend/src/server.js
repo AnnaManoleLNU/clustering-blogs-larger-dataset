@@ -18,8 +18,8 @@ try {
   const chosenWords = adf.words;
   await adf.processFiles(chosenWords);
   console.log("Articles processed successfully");
-  const results = await adf.getTopWords();
-  console.log("results", results);
+  // const results = await adf.getTopWords();
+  // console.log("results", results);
   // ---------------------------- //
 
   dotenv.config();

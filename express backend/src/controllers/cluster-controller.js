@@ -138,7 +138,18 @@ export class ClusterController {
     const result = {};
     for (let i = 0; i < centroids.length; i++) {
       const centroid = centroids[i];
-      result[centroid.id] = centroid.assignments;
+      const {gameCount,
+        programmingCount,
+        accuracy} = this.calculateClusterAccuracy(
+        centroid.assignments,
+        articles
+      );
+      result[centroid.id] = {
+        assignments: centroid.assignments,
+        gameCount,
+        programmingCount,
+        accuracy
+      };
     }
 
     return result;
@@ -213,6 +224,33 @@ export class ClusterController {
 
     return result;
   }
+
+  calculateClusterAccuracy(clusterAssignments, articles) {
+    const gameArticles = articles.slice(0, 90);
+    const programmingArticles = articles.slice(90);
+    let gameCount = 0;
+    let programmingCount = 0;
+  
+    for (const article of clusterAssignments) {
+      if (gameArticles.includes(article)) {
+        gameCount++;
+      } else if (programmingArticles.includes(article)) {
+        programmingCount++;
+      }
+    }
+  
+    // Determine the majority category and calculate accuracy
+  const total = clusterAssignments.length;
+  const majorityCorrectCount = Math.max(gameCount, programmingCount);
+  const accuracy = (majorityCorrectCount / total) * 100;
+
+  return {
+    gameCount,
+    programmingCount,
+    accuracy,
+  };
+  }
+  
 
   getClustersFixedIterations = async (req, res, next) => {
     try {

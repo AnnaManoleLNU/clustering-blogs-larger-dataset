@@ -4,9 +4,15 @@ import { Button } from "@/components/ui/button";
 import { H2 } from "./components/typography/h2";
 import { Tree } from "react-arborist";
 import ArticleCategoryTitles from "./features/ArticleCategoryTitles";
+import { Small } from "./components/typography/small";
 
 interface Cluster {
-  [key: string]: string[];
+  [key: string]: {
+    assignments: string[];
+    accuracy: number; 
+    gameCount: number;
+    programmingCount: number;
+  };
 }
 
 interface TreeNode {
@@ -116,11 +122,14 @@ function App() {
       {Object.entries(clusters).map(([clusterName, articles]) => (
         <div key={clusterName}>
           <H2 text={clusterName} className="-mb-2 !mt-2 border-b-0" />
-          <ul>
-            {articles.map((article, index) => (
-              <li key={index}>{article}</li>
-            ))}
-          </ul>
+          <Small text={articles.assignments.join(" ♦ ")} />
+          
+          <div className="flex gap-2 mt-2 bg-primary p-2 rounded-lg">
+            <Small text={`Accuracy: ${articles.accuracy.toFixed(2)}%`} />
+            <Small text={`Game count: ${articles.gameCount}`} />
+            <Small text={`Programming count: ${articles.programmingCount}`} />
+          </div>
+
         </div>
       ))}
 
