@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { H1 } from "./components/typography/h1";
-import { P } from "./components/typography/p";
 import { Button } from "@/components/ui/button";
 import { H2 } from "./components/typography/h2";
 import { Tree } from "react-arborist";
+import ArticleCategoryTitles from "./features/ArticleCategoryTitles";
 
 interface Cluster {
   [key: string]: string[];
@@ -56,7 +56,7 @@ function App() {
     data: { title?: string; children: [] },
     idPrefix = "node"
   ): TreeNode[] => {
-    const transformedChildren =  data.children.map(
+    const transformedChildren = data.children.map(
       (child: { title?: string; children: [] }, index: number) => ({
         id: `${idPrefix}-${index}`,
         title: child.title || "",
@@ -86,10 +86,20 @@ function App() {
   return (
     <>
       <H1 text="Articles available" />
-      <P text={articles.join(" ♦ ")} />
+
+      <ArticleCategoryTitles
+        articleTitles={articles.slice(0, 90).join(" ♦ ")}
+      />
+
+      <ArticleCategoryTitles
+        articleTitles={articles.slice(90, 180).join(" ♦ ")}
+      />
 
       <div className="flex gap-2 mt-4 mb-4">
-        <Button onClick={clusterArticlesFixedIterations} disabled={isLoadingFixed}>
+        <Button
+          onClick={clusterArticlesFixedIterations}
+          disabled={isLoadingFixed}
+        >
           Cluster articles fixed iterations (10)
         </Button>
         <Button
