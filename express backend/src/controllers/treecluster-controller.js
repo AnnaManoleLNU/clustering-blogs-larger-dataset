@@ -1,7 +1,7 @@
 import { ArticleController } from "./article-controller.js";
 
 export class TreeClusterController {
-  #numberOfWords = 0; // Initialize dynamically
+  #numberOfWords = 0;
 
   constructor() {
     this.clusters = [];
@@ -22,6 +22,7 @@ export class TreeClusterController {
 
   // Generate initial clusters from article titles
   async generateClusters() {
+    this.clusters = [];
     const articleTitles = await this.articleController.getArticleTitles();
 
     for (const articleTitle of articleTitles) {
@@ -96,9 +97,8 @@ export class TreeClusterController {
   }
 
   async generateHierarchy() {
-    if (this.clusters.length === 0) {
-      await this.generateClusters();
-    }
+    this.clusters = [];
+    await this.generateClusters();
 
     while (this.clusters.length > 1) {
       let closest = Infinity;
@@ -132,17 +132,19 @@ export class TreeClusterController {
   }
 
   // Serialize a single cluster to avoid circular references
-  serializeTree(cluster) {
+  serializeTree(cluster, depth = 0) {
     if (!cluster) return null;
-
-    const title = cluster.article.articleTitle || null;
-
+  
+    const title = cluster.article?.articleTitle || "Cluster";
+  
+    // Add depth for simpler rendering
     return {
-      title: title,
+      title,
+      depth,
       children: [
-        this.serializeTree(cluster.left),
-        this.serializeTree(cluster.right),
-      ].filter((child) => child !== null),
+        this.serializeTree(cluster.left, depth + 1),
+        this.serializeTree(cluster.right, depth + 1),
+      ].filter(Boolean), // Remove null children
     };
   }
 

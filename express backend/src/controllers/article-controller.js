@@ -15,7 +15,6 @@ export class ArticleController {
 
   async getArticleTitles() {
     const articleTitles = [];
-
     const data = await fs.readFile(this.defaultFilePath, "utf8");
     const lines = data.split("\n");
 
@@ -23,8 +22,6 @@ export class ArticleController {
       const name = lines[i].split("\t")[0];
       articleTitles.push(name);
     }
-
-    console.log(articleTitles.length);
     return articleTitles;
   }
 
@@ -48,8 +45,6 @@ export class ArticleController {
     for (let i = 1; i < words.length; i++) {
       keywords.push(words[i]);
     }
-
-    console.log(keywords.length);
     return keywords;
   }
 

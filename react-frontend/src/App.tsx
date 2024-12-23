@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { H1 } from "./components/typography/h1";
 import { Button } from "@/components/ui/button";
 import { H2 } from "./components/typography/h2";
-import { Tree } from "react-arborist";
 import ArticleCategoryTitles from "./features/ArticleCategoryTitles";
 import { Small } from "./components/typography/small";
+import TreeView from "./features/TreeView";
 
 interface Cluster {
   [key: string]: {
@@ -17,7 +17,8 @@ interface Cluster {
 
 interface TreeNode {
   id: string;
-  title?: string;
+  title: string;
+  depth: number;
   children?: TreeNode[];
 }
 
@@ -69,6 +70,7 @@ function App() {
 
   const clusterArticlesHierarchical = async () => {
     setClusters({});
+    setTreeData([]);
     const route =
       wordSelection === "words"
         ? "http://localhost:3000/clusters/hierarchical"
@@ -80,23 +82,22 @@ function App() {
   };
 
   const transformData = (
-    data: { title?: string; children: [] },
-    idPrefix = "node"
+    data: TreeNode,
+    parentId: string = "root",
+    depth: number = 0
   ): TreeNode[] => {
-    const transformedChildren = data.children.map(
-      (child: { title?: string; children: [] }, index: number) => ({
-        id: `${idPrefix}-${index}`,
-        title: child.title || "",
-        children: child.children?.length
-          ? transformData(child, `${idPrefix}-${index}`)
-          : [],
-      })
+    const nodeId = `${parentId}-${depth}`;
+
+    // Recursively transform children if they exist
+    const transformedChildren = (data.children || []).map(
+      (child, index) => transformData(child, `${nodeId}-${index}`, depth + 1)[0] // Single child transformation
     );
 
     return [
       {
-        id: `${idPrefix}-root`,
-        title: "",
+        id: nodeId,
+        title: data.title || "Cluster",
+        depth,
         children: transformedChildren,
       },
     ];
@@ -146,10 +147,12 @@ function App() {
 
       {Object.entries(clusters).map(([clusterName, articles]) => (
         <div key={clusterName}>
-          <H2 text={clusterName} className="-mb-2 !mt-2 border-b-0" />
-          <Small text={articles.assignments.join(" ♦ ")} />
+          <div>
+            <H2 text={clusterName} className="-mb-2 !mt-2 border-b-0" />
+            <Small text={articles.assignments.join(" ♦ ")} />
+          </div>
 
-          <div className="flex gap-2 mt-2 bg-primary p-2 rounded-lg">
+          <div className="inline-flex gap-2 mt-2 text-primary bg-accent-foreground p-2 rounded-lg">
             <Small text={`Accuracy: ${articles.accuracy.toFixed(2)}%`} />
             <Small text={`Game count: ${articles.gameCount}`} />
             <Small text={`Programming count: ${articles.programmingCount}`} />
@@ -157,31 +160,7 @@ function App() {
         </div>
       ))}
 
-      <Tree
-        data={treeData}
-        width={1800}
-        indent={20}
-        rowHeight={30}
-        children={({ node, style }) => (
-          <div style={style}>
-            {node.children && node.children.length > 0 ? (
-              <span
-                role="img"
-                aria-label={node.isOpen ? "folder-open" : "folder-closed"}
-                onClick={() => node.toggle()}
-                className="mr-2 cursor-pointer"
-              >
-                {node.isOpen ? "📂" : "📁"}
-              </span>
-            ) : (
-              <span role="img" aria-label="file" className="mr-2">
-                📄
-              </span>
-            )}
-            <span>{node.data.title}</span>
-          </div>
-        )}
-      />
+      <TreeView data={treeData} />
     </>
   );
 }
