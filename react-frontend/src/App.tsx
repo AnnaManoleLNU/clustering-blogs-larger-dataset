@@ -28,7 +28,10 @@ function App() {
   const [isLoadingFixed, setIsLoadingFixed] = useState<boolean>(false);
   const [isLoadingFlexible, setIsLoadingFlexible] = useState<boolean>(false);
   const [treeData, setTreeData] = useState<TreeNode[]>([]);
-  const [treeMetrics, setTreeMetrics] = useState<{ depth: number; totalNodes: number }>({ depth: 0, totalNodes: 0 });
+  const [treeMetrics, setTreeMetrics] = useState<{
+    depth: number;
+    totalNodes: number;
+  }>({ depth: 0, totalNodes: 0 });
   const [wordSelection, setWordSelection] = useState<string>("words"); // Dropdown state
 
   const fetchArticleTitles = async () => {
@@ -108,7 +111,9 @@ function App() {
     ];
   };
 
-  const calculateTreeMetrics = (tree: TreeNode[]): { depth: number; totalNodes: number } => {
+  const calculateTreeMetrics = (
+    tree: TreeNode[]
+  ): { depth: number; totalNodes: number } => {
     const getDepth = (node: TreeNode): number => {
       if (!node.children || node.children.length === 0) return 1;
       return 1 + Math.max(...node.children.map(getDepth));
@@ -183,12 +188,12 @@ function App() {
         </div>
       ))}
 
-      <div className="mt-2 inline-flex gap-2 text-primary bg-accent-foreground p-2 rounded-lg">
-      
-        <Small text={`Tree Depth: ${treeMetrics.depth} `} />
-        <Small text={`Total Nodes: ${treeMetrics.totalNodes}`} />
-
-      </div>
+      {treeData && treeData.length > 0 && (
+        <div className="mt-2 inline-flex gap-2 text-primary bg-accent-foreground p-2 rounded-lg">
+          <Small text={`Tree Depth: ${treeMetrics.depth} `} />
+          <Small text={`Total Nodes: ${treeMetrics.totalNodes}`} />
+        </div>
+      )}
 
       <TreeView data={treeData} />
     </>
