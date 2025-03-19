@@ -1,59 +1,22 @@
-# Project
+# Clustering Wikipedia Articles
 
+This project involves clustering Wikipedia articles about programming and games. The goal is to analyze how well the articles can be grouped based on their content.
 
-<!----------------------------------------------------------------------------->
-<details>
-  <summary><h2>P2 - Clustering</h2></summary>
+## Overview  
+I modified the clustering system to work with a dataset of 180 Wikipedia articles (90 about programming and 90 about games). The dataset can be downloaded from the [Datasets](https://coursepress.lnu.se/courses/web-intelligence/assignments/datasets) page.  
 
-This is one of the pre-defined project ideas you can choose for your project.
+## Approach  
+### **1. Word Frequency Calculation**  
+Selected a set of keywords related to programming and games and calculated their frequency in each article. This reduces complexity and improves clustering performance.
 
-### Clustering Wikipedia articles
+### **2. Clustering**  
+- **K-means clustering**: Grouped the 180 articles into two clusters. Checked if they were separated into programming and gaming clusters.  
+- **Hierarchical clustering**: Performed hierarchical clustering to see if articles on similar topics formed clear branches.  
 
-Modify your clustering system from Assignment 2 to use Wikipedia articles (90 articles about Programming, 90 about Games). The dataset can be downloaded on the [Datasets](https://coursepress.lnu.se/courses/web-intelligence/assignments/datasets) page.
+### **3. Word List Optimization**  
+Created a custom word list with over 100 words and repeated the clustering process to compare results. The goal was to see if a more refined word list improved clustering accuracy.  
 
-To use the dataset for clustering, you need to select some words and calculate the frequency of these words in each Wikipedia article. It is not recommended to use all words from the articles since similarity calculations will then take a long time. You can, for example, use the following words:
-
-`language, programming, computer, software, hardware, data, player, online, system, development, machine, console, developer, design, history, technology, standard, information, article, example`
-
-The article *Arcade_game* would then have the following frequencies:
-
-`0;4;14;1;58;1;11;7;12;4;9;17;0;5;33;8;1;2;7;1`
-
-### Grading
-
-<table>
-  <tr>
-    <th>Grade</th>
-    <th>Requirements</th>
-  </tr>
-  <tr>
-    <td>E</td>
-    <td>
-      <ul>
-        <li>Read all articles about programming and games and convert each article to word frequencies using the word list above.</li>
-        <li>Perform k-means clustering on the 180 articles using two clusters.</li>
-        <li>Are the articles well separated into one cluster of gaming related articles and one cluster about programming?</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <td>C-D</td>
-    <td>
-      <ul>
-        <li>Perform hierarchical clustering on the 180 articles.</li>
-        <li>Are articles about similar topics well separated into branches?</li>
-      </ul>
-    </td>
-  </tr>
-  <tr>
-    <td>A-B</td>
-    <td>
-      <ul>
-        <li>Generate your own word list of at least 100 words.</li>
-        <li>Repeat k-means and hierarchical clustering using the new word list.</li>
-        <li>Are the results better with the new word list?</li>
-      </ul>
-    </td>
-  </tr>
-</table>
-</details>
+## Results  
+- K-means clustering mostly separated the articles into programming and gaming clusters.  
+- Hierarchical clustering showed meaningful grouping of similar topics.  
+- The custom word list improved clustering accuracy, making topic separation more precise.  
